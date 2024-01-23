@@ -1,6 +1,15 @@
-// src/controllers/authController.js
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+
+const generateToken = (user) => {
+  return jwt.sign(
+    { id: user._id, username: user.username },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "1h",
+    }
+  );
+};
 
 // Register new user
 const registerUser = async (req, res) => {
@@ -11,24 +20,16 @@ const registerUser = async (req, res) => {
     await user.save();
 
     // Generate token after successful registration
-    const token = jwt.sign(
-      { id: user._id, username: user.username },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "1h",
-      }
-    );
+    const token = generateToken(user);
 
     res
       .status(201)
       .json({ success: true, message: "User registered successfully.", token });
   } catch (error) {
-    res
-      .status(400)
-      .json({
-        success: false,
-        message: "Bad Request. User registration failed.",
-      });
+    res.status(400).json({
+      success: false,
+      message: "Bad Request. User registration failed.",
+    });
   }
 };
 
@@ -39,38 +40,28 @@ const loginUser = async (req, res) => {
   try {
     const user = await User.findOne({ username });
     if (!user) {
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message: "Authentication failed. User not found.",
-        });
+      return res.status(401).json({
+        success: false,
+        message: "Authentication failed. User not found.",
+      });
     }
 
     const isPasswordMatch = await user.comparePassword(password);
     if (!isPasswordMatch) {
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message: "Authentication failed. Incorrect password.",
-        });
+      return res.status(401).json({
+        success: false,
+        message: "Authentication failed. Incorrect password.",
+      });
     }
 
-    const token = jwt.sign(
-      { id: user._id, username: user.username },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "1h",
-      }
-    );
+    // Generate token after successful login
+    const token = generateToken(user);
 
     res.status(200).json({ success: true, token });
   } catch (error) {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
-
 // Get all users
 const getAllUsers = async (req, res) => {
   try {

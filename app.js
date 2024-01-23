@@ -22,6 +22,9 @@ app.use("/jurnal", jurnalRoutes);
 const authRoutes = require("./src/routes/authRoutes");
 app.use("/auth", authRoutes);
 
+const githubRoutes = require("./src/routes/githubRoutes");
+app.use("/github", githubRoutes);
+
 // Routes Welcome
 const welcomeRoutes = require("./src/routes/welcomeRoutes");
 app.use("/welcome", welcomeRoutes);

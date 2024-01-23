@@ -1,9 +1,8 @@
-// config/middleware/auth.js
 const jwt = require("jsonwebtoken");
 
 const authenticateToken = (req, res, next) => {
-  // Jika rute adalah rute pendaftaran, lanjutkan ke middleware berikutnya tanpa memeriksa token
-  if (req.path === "/auth/register") {
+  // Jika rute adalah rute pendaftaran atau login, lanjutkan ke middleware berikutnya tanpa memeriksa token
+  if (req.path === "/auth/register" || req.path === "/auth/login") {
     return next();
   }
 
